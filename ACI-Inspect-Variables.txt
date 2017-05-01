@@ -1,0 +1,148 @@
+!!! Web subnet = {{webIP}}
+!!! App subnet = {{appIP}}
+!!! Ext L3 VLAN = {{extVLAN}}
+!!! Layer3 out address = {{L3outIP}}
+!!! Layer3 out MAC address = {{L3outMAC}}
+!!! Layer3 out Leaf = {{L3outNode}}
+!!! Layer3 out Interface = {{L3outINTF}}
+!!! Layer3 loopback = {{L3outLoopB}}
+
+
+
+
+
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}.json {"fvTenant":{"attributes":{"dn":"uni/tn-{{tenant}}","name":"{{tenant}}","rn":"tn-{{tenant}}","status":"created"},"children":[]}} 
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/ctx-{{tenant}}_PROD_VRF.json {"fvCtx":{"attributes":{"dn":"uni/tn-{{tenant}}/ctx-{{tenant}}_PROD_VRF","name":"{{tenant}}_PROD_VRF","rn":"ctx-{{tenant}}_PROD_VRF","status":"created"},"children":[]}} 
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/{{tenant}}_WEB_BD.json {"fvBD":{"attributes":{"dn":"uni/tn-{{tenant}}/{{tenant}}_WEB_BD","mac":"{{L3outMAC}}","name":"Web_BD","rn":"{{tenant}}_WEB_BD","status":"created"},"children":[{"fvSubnet":{"attributes":{"dn":"uni/tn-{{tenant}}/{{tenant}}_WEB_BD/subnet-[{{webIP}}]","ip":"{{webIP}}","scope":"shared","rn":"subnet-[{{webIP}}]","status":"created"},"children":[]}},{"fvRsCtx":{"attributes":{"tnFvCtxName":"{{tenant}}_PROD_VRF","status":"created,modified"},"children":[]}}]}} 
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/{{tenant}}_APP_BD.json {"fvBD":{"attributes":{"dn":"uni/tn-{{tenant}}/{{tenant}}_APP_BD","mac":"{{L3outMAC}}","name":"App_BD","rn":"{{tenant}}_APP_BD","status":"created"},"children":[{"fvSubnet":{"attributes":{"dn":"uni/tn-{{tenant}}/{{tenant}}_APP_BD/subnet-[{{appIP}}]","ip":"{{appIP}}","rn":"subnet-[{{appIP}}]","status":"created"},"children":[]}},{"fvRsCtx":{"attributes":{"tnFvCtxName":"{{tenant}}_PROD_VRF","status":"created,modified"},"children":[]}}]}} 
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/ap-{{tenant}}_AppProfile.json {"fvAp":{"attributes":{"dn":"uni/tn-{{tenant}}/ap-{{tenant}}_AppProfile","name":"{{tenant}}_AppProfile","rn":"ap-{{tenant}}_AppProfile","status":"created"},"children":[{"fvAEPg":{"attributes":{"dn":"uni/tn-{{tenant}}/ap-{{tenant}}_AppProfile/epg-App_Servers","name":"App_Servers","rn":"epg-App_Servers","status":"created"},"children":[{"fvRsBd":{"attributes":{"tnFvBDName":"App_BD","status":"created,modified"},"children":[]}}]}},{"fvAEPg":{"attributes":{"dn":"uni/tn-{{tenant}}/ap-{{tenant}}_AppProfile/epg-Web_Servers","name":"Web_Servers","rn":"epg-Web_Servers","status":"created"},"children":[{"fvRsBd":{"attributes":{"tnFvBDName":"Web_BD","status":"created,modified"},"children":[]}}]}}]}} 
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/SSH_Filter.json {"vzFilter":{"attributes":{"dn":"uni/tn-{{tenant}}/SSH_Filter","name":"SSH","rn":"SSH_Filter","status":"created"},"children":[{"vzEntry":{"attributes":{"dn":"uni/tn-{{tenant}}/SSH_Filter/TCP_SSH","name":"TCP-SSH","etherT":"ip","prot":"tcp","dFromPort":"22","dToPort":"22","rn":"TCP_SSH","status":"created"},"children":[]}}]}} 
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/brc-Access_Contract.json {"vzBrCP":{"attributes":{"dn":"uni/tn-{{tenant}}/brc-Access_Contract","name":"Access_Contract","rn":"brc-Access_Contract","status":"created"},"children":[{"vzSubj":{"attributes":{"dn":"uni/tn-{{tenant}}/brc-Access_Contract/subj-App_Services","name":"App_Services","rn":"subj-App_Services","status":"created"},"children":[{"vzRsSubjFiltAtt":{"attributes":{"status":"created,modified","tnVzFilterName":"SSH"},"children":[]}}]}}]}} 
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/ap-{{tenant}}_AppProfile/epg-App_Servers.json {"fvRsProv":{"attributes":{"tnVzBrCPName":"Access_Contract","status":"created,modified"},"children":[]}} 
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/ap-{{tenant}}_AppProfile/epg-Web_Servers.json {"fvRsCons":{"attributes":{"tnVzBrCPName":"Access_Contract","status":"created,modified"},"children":[]}} 
+
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/out-{{tenant}}_L3_Out.json 
+
+payload{"l3extOut":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out","name":"{{tenant}}_L3_Out","rn":"out-{{tenant}}_L3_Out","status":"created"},"children":[{"l3extInstP":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/instP-{{tenant}}_Ext_EPG","name":"{{tenant}}_Ext_EPG","rn":"instP-{{tenant}}_Ext_EPG","status":"created"},"children":[{"l3extSubnet":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/instP-{{tenant}}_Ext_EPG/extsubnet-[0.0.0.0/0]","ip":"0.0.0.0/0","aggregate":"","rn":"extsubnet-[0.0.0.0/0]","status":"created"},"children":[]}}]}},{"l3extLNodeP":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/lnodep-{{tenant}}_Node_Out","name":"{{tenant}}_Node_Out","rn":"lnodep-{{tenant}}_Node_Out","status":"created"},"children":[{"l3extLIfP":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/lnodep-{{tenant}}_Node_Out/lifp-{{tenant}}_L3_Intf","name":"{{tenant}}_L3_Intf","rn":"lifp-{{tenant}}_L3_Intf","status":"created"},"children":[{"l3extRsPathL3OutAtt":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/lnodep-{{tenant}}_Node_Out/lifp-{{tenant}}_L3_Intf/rspathL3OutAtt-[topology/pod-1/paths-{{L3outNode}}/pathep-{{L3outINTF}}]","mac":"{{L3outMAC}}","ifInstT":"l3-port","addr":"{{L3outIP}}","tDn":"topology/pod-1/paths-{{L3outNode}}/pathep-{{L3outINTF}}","rn":"rspathL3OutAtt-[topology/pod-1/paths-{{L3outNode}}/pathep-{{L3outINTF}}]","status":"created"},"children":[]}}]}},{"l3extRsNodeL3OutAtt":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/lnodep-{{tenant}}_Node_Out/rsnodeL3OutAtt-[topology/pod-1/node-{{L3outNode}}]","tDn":"topology/pod-1/node-{{L3outNode}}","rtrId":"{{L3outLoopB}}","rn":"rsnodeL3OutAtt-[topology/pod-1/node-{{L3outNode}}]","status":"created"},"children":[{"l3extInfraNodeP":{"attributes":{"fabricExtCtrlPeering":"false","status":"created"},"children":[]}}]}}]}},{"l3extRsEctx":{"attributes":{"tnFvCtxName":"{{tenant}}_PROD_VRF","status":"created,modified"},"children":[]}},{"l3extRsL3DomAtt":{"attributes":{"tDn":"uni/l3dom-{{tenant}}_L3","status":"created"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/out-{{tenant}}_L3_Out.json 
+
+payload{"l3extOut":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out","status":"modified"},"children":[{"ospfExtP":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/ospfExtP","areaId":"0","areaType":"regular","status":"created"},"children":[]}},{"pimExtP":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/pimextp","status":"deleted"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/out-{{tenant}}_L3_Out.json 
+
+payload{"l3extOut":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out","status":"modified"},"children":[{"ospfExtP":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/ospfExtP","areaId":"0","areaType":"regular","status":"created"},"children":[]}},{"pimExtP":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/pimextp","status":"deleted"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/infra/vlanns-[{{tenant}}_extL3_VLAN]-static.json 
+
+payload{"fvnsVlanInstP":{"attributes":{"dn":"uni/infra/vlanns-[{{tenant}}_extL3_VLAN]-static","name":"{{tenant}}_extL3_VLAN","allocMode":"static","rn":"vlanns-[{{tenant}}_extL3_VLAN]-static","status":"created"},"children":[]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/l3dom-{{tenant}}_L3/rsvlanNs.json 
+
+payload{"infraRsVlanNs":{"attributes":{"tDn":"uni/infra/vlanns-[{{tenant}}_extL3_VLAN]-static"},"children":[]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/infra.json 
+
+payload{"infraInfra":{"attributes":{"dn":"uni/infra","status":"modified"},"children":[{"infraAttEntityP":{"attributes":{"dn":"uni/infra/attentp-{{tenant}}_extL3_AEP","name":"{{tenant}}_extL3_AEP","rn":"attentp-{{tenant}}_extL3_AEP","status":"created"},"children":[]}},{"infraFuncP":{"attributes":{"dn":"uni/infra/funcprof","status":"modified"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/l3dom-{{tenant}}_extL3_Domain.json 
+
+payload{"l3extDomP":{"attributes":{"dn":"uni/l3dom-{{tenant}}_extL3_Domain","name":"{{tenant}}_extL3_Domain","rn":"l3dom-{{tenant}}_extL3_Domain","status":"created"},"children":[{"infraRsVlanNs":{"attributes":{"tDn":"uni/infra/vlanns-[{{tenant}}_extL3_VLAN]-static","status":"created"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/infra/attentp-{{tenant}}_extL3_AEP.json 
+
+payload{"infraRsDomP":{"attributes":{"tDn":"uni/l3dom-{{tenant}}_extL3_Domain","status":"created,modified"},"children":[]}} response: {"totalCount":"0","imdata":[]}
+
+
+{{url}}/api/node/mo/uni/infra/funcprof/accportgrp-{{tenant}}_extL3_Pol_Grp.json 
+
+payload{"infraAccPortGrp":{"attributes":{"dn":"uni/infra/funcprof/accportgrp-{{tenant}}_extL3_Pol_Grp","name":"{{tenant}}_extL3_Pol_Grp","rn":"accportgrp-{{tenant}}_extL3_Pol_Grp","status":"created"},"children":[{"infraRsAttEntP":{"attributes":{"tDn":"uni/infra/attentp-{{tenant}}_extL3_AEP","status":"created,modified"},"children":[]}},{"infraRsCdpIfPol":{"attributes":{"tnCdpIfPolName":"CDP_DISABLE","status":"created,modified"},"children":[]}},{"infraRsLldpIfPol":{"attributes":{"tnLldpIfPolName":"LLDP_ENABLE","status":"created,modified"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/infra/accportprof-LEAF-102/hports-LEAF-102_Eth48-typ-range/rsaccBaseGrp.json 
+
+payload{"infraRsAccBaseGrp":{"attributes":{"tDn":"uni/infra/funcprof/accportgrp-{{tenant}}_extL3_Pol_Grp"},"children":[]}} response: {"totalCount":"0","imdata":[]}
+
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/rsl3DomAtt.json
+
+payload{"l3extRsL3DomAtt":{"attributes":{"tDn":"uni/l3dom-{{tenant}}_extL3_Domain"},"children":[]}} response: {"totalCount":"0","imdata":[]}
+
+
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/lnodep-{{tenant}}_extL3_Node.json payload{"l3extLNodeP":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/lnodep-{{tenant}}_extL3_Node","name":"{{tenant}}_extL3_Node","rn":"lnodep-{{tenant}}_extL3_Node","status":"created"},"children":[{"l3extLIfP":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/lnodep-{{tenant}}_extL3_Node/lifp-{{tenant}}_extL3_OSPF","name":"{{tenant}}_extL3_OSPF","rn":"lifp-{{tenant}}_extL3_OSPF","status":"created"},"children":[{"ospfIfP":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/lnodep-{{tenant}}_extL3_Node/lifp-{{tenant}}_extL3_OSPF/ospfIfP","rn":"ospfIfP","status":"created"},"children":[{"ospfRsIfPol":{"attributes":{"tnOspfIfPolName":"default","status":"created,modified"},"children":[]}}]}},{"l3extRsPathL3OutAtt":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/lnodep-{{tenant}}_extL3_Node/lifp-{{tenant}}_extL3_OSPF/rspathL3OutAtt-[topology/pod-1/paths-{{L3outNode}}/pathep-{{L3outINTF}}]","mac":"{{L3outMAC}}","ifInstT":"l3-port","addr":"{{L3outIP}}","mtu":"1500","tDn":"topology/pod-1/paths-{{L3outNode}}/pathep-{{L3outINTF}}","rn":"rspathL3OutAtt-[topology/pod-1/paths-{{L3outNode}}/pathep-{{L3outINTF}}]","status":"created"},"children":[]}}]}},{"l3extRsNodeL3OutAtt":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/lnodep-{{tenant}}_extL3_Node/rsnodeL3OutAtt-[topology/pod-1/node-{{L3outNode}}]","tDn":"topology/pod-1/node-{{L3outNode}}","rtrId":"{{L3outLoopB}}","rn":"rsnodeL3OutAtt-[topology/pod-1/node-{{L3outNode}}]","status":"created"},"children":[{"l3extInfraNodeP":{"attributes":{"fabricExtCtrlPeering":"false","status":"created"},"children":[]}}]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/out-{{tenant}}_L3_Out.json 
+
+payload{"l3extOut":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out","status":"modified"},"children":[{"l3extInstP":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/instP-{{tenant}}_Ext_EPG","status":"deleted"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/instP-{{tenant}}_extL3_EPG.json 
+
+payload{"l3extInstP":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/instP-{{tenant}}_extL3_EPG","name":"{{tenant}}_extL3_EPG","rn":"instP-{{tenant}}_extL3_EPG","status":"created"},"children":[{"l3extSubnet":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/instP-{{tenant}}_extL3_EPG/extsubnet-[0.0.0.0/0]","ip":"0.0.0.0/0","aggregate":"","rn":"extsubnet-[0.0.0.0/0]","status":"created"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/instP-{{tenant}}_extL3_EPG.json 
+
+payload{"fvRsCons":{"attributes":{"tnVzBrCPName":"Access_Contract","status":"created,modified"},"children":[]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/{{tenant}}_APP_BD/subnet-[{{appIP}}].json 
+
+payload{"fvSubnet":{"attributes":{"dn":"uni/tn-{{tenant}}/{{tenant}}_APP_BD/subnet-[{{appIP}}]","scope":"public"},"children":[{"fvRsBDSubnetToProfile":{"attributes":{"tnL3extOutName":"{{tenant}}_L3_Out","status":"created,modified"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/{{tenant}}_WEB_BD/subnet-[{{webIP}}].json 
+
+payload{"fvSubnet":{"attributes":{"dn":"uni/tn-{{tenant}}/{{tenant}}_WEB_BD/subnet-[{{webIP}}]","scope":"public"},"children":[{"fvRsBDSubnetToProfile":{"attributes":{"tnL3extOutName":"{{tenant}}_L3_Out","status":"created,modified"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/{{tenant}}_WEB_BD.json 
+
+payload{"fvRsBDToOut":{"attributes":{"tnL3extOutName":"{{tenant}}_L3_Out","status":"created"},"children":[]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/{{tenant}}_APP_BD.json 
+
+payload{"fvRsBDToOut":{"attributes":{"tnL3extOutName":"{{tenant}}_L3_Out","status":"created"},"children":[]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/{{tenant}}_APP_BD/subnet-[{{appIP}}]/rsBDSubnetToProfile.json 
+
+payload{"fvRsBDSubnetToProfile":{"attributes":{"dn":"uni/tn-{{tenant}}/{{tenant}}_APP_BD/subnet-[{{appIP}}]/rsBDSubnetToProfile","status":"deleted"},"children":[]}} response: {"totalCount":"0","imdata":[]}
+
+
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/out-{{tenant}}_L3_Out.json payload{"l3extOut":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out","status":"modified"},"children":[{"l3extLNodeP":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/lnodep-{{tenant}}_extL3_Node","status":"deleted"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/lnodep-{{tenant}}_Leaf{{L3outNode}}.json payload{"l3extLNodeP":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/lnodep-{{tenant}}_Leaf{{L3outNode}}","name":"{{tenant}}_Leaf{{L3outNode}}","rn":"lnodep-{{tenant}}_Leaf{{L3outNode}}","status":"created"},"children":[{"l3extRsNodeL3OutAtt":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/lnodep-{{tenant}}_Leaf{{L3outNode}}/rsnodeL3OutAtt-[topology/pod-1/node-{{L3outNode}}]","tDn":"topology/pod-1/node-{{L3outNode}}","rtrId":"{{L3outLoopB}}","rn":"rsnodeL3OutAtt-[topology/pod-1/node-{{L3outNode}}]","status":"created"},"children":[{"l3extInfraNodeP":{"attributes":{"fabricExtCtrlPeering":"false","status":"created"},"children":[]}}]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/lnodep-{{tenant}}_Leaf{{L3outNode}}/lifp-{{tenant}}_Leaf{{L3outNode}}-{{L3outINTF}}.json payload{"l3extLIfP":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/lnodep-{{tenant}}_Leaf{{L3outNode}}/lifp-{{tenant}}_Leaf{{L3outNode}}-{{L3outINTF}}","name":"{{tenant}}_Leaf{{L3outNode}}-{{L3outINTF}}","rn":"lifp-{{tenant}}_Leaf{{L3outNode}}-{{L3outINTF}}","status":"created"},"children":[{"ospfIfP":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/lnodep-{{tenant}}_Leaf{{L3outNode}}/lifp-{{tenant}}_Leaf{{L3outNode}}-{{L3outINTF}}/ospfIfP","rn":"ospfIfP","status":"created"},"children":[{"ospfRsIfPol":{"attributes":{"tnOspfIfPolName":"default","status":"created,modified"},"children":[]}}]}},{"l3extRsPathL3OutAtt":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/lnodep-{{tenant}}_Leaf{{L3outNode}}/lifp-{{tenant}}_Leaf{{L3outNode}}-{{L3outINTF}}/rspathL3OutAtt-[topology/pod-1/paths-{{L3outNode}}/pathep-{{L3outINTF}}]","mac":"{{L3outMAC}}","ifInstT":"l3-port","addr":"{{L3outIP}}","mtu":"1500","tDn":"topology/pod-1/paths-{{L3outNode}}/pathep-{{L3outINTF}}","rn":"rspathL3OutAtt-[topology/pod-1/paths-{{L3outNode}}/pathep-{{L3outINTF}}]","status":"created"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/ospfExtP.json payload{"ospfExtP":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/ospfExtP","areaType":"regular","areaId":"0"},"children":[]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/pimextp.json payload{"pimExtP":{"attributes":{"dn":"uni/tn-{{tenant}}/out-{{tenant}}_L3_Out/pimextp","status":"deleted"},"children":[]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/{{tenant}}_WEB_BD/subnet-[{{webIP}}]/rsBDSubnetToProfile.json payload{"fvRsBDSubnetToProfile":{"attributes":{"dn":"uni/tn-{{tenant}}/{{tenant}}_WEB_BD/subnet-[{{webIP}}]/rsBDSubnetToProfile","status":"deleted"},"children":[]}} response: {"totalCount":"0","imdata":[]}
+
+
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/ap-{{tenant}}_AppProfile/epg-App_Servers.json payload{"fvRsPathAtt":{"attributes":{"encap":"vlan-{{extVLAN}}","instrImedcy":"immediate","mode":"untagged","tDn":"topology/pod-1/paths-101/pathep-[eth1/11]","status":"created"},"children":[]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/infra/attentp-{{tenant}}_extL3_AEP/gen-default.json payload{"infraRsFuncToEpg":{"attributes":{"tDn":"uni/tn-{{tenant}}/ap-{{tenant}}_AppProfile/epg-App_Servers","status":"created,modified","encap":"vlan-{{extVLAN}}"},"children":[]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/infra/attentp-{{tenant}}_extL3_AEP/gen-default/rsfuncToEpg-[uni/tn-{{tenant}}/ap-{{tenant}}_AppProfile/epg-App_Servers].json payload{"infraRsFuncToEpg":{"attributes":{"mode":"untagged","tDn":"uni/tn-{{tenant}}/ap-{{tenant}}_AppProfile/epg-App_Servers"},"children":[]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/infra/attentp-{{tenant}}_extL3_AEP/gen-default/rsfuncToEpg-[uni/tn-{{tenant}}/ap-{{tenant}}_AppProfile/epg-App_Servers].json payload{"infraRsFuncToEpg":{"attributes":{"mode":"regular","tDn":"uni/tn-{{tenant}}/ap-{{tenant}}_AppProfile/epg-App_Servers"},"children":[]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/infra/attentp-{{tenant}}_extL3_AEP.json payload{"infraAttEntityP":{"attributes":{"dn":"uni/infra/attentp-{{tenant}}_extL3_AEP","status":"modified"},"children":[{"infraRsDomP":{"attributes":{"dn":"uni/infra/attentp-{{tenant}}_extL3_AEP/rsdomP-[uni/phys-{{tenant}}_physical]","status":"deleted"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/infra/attentp-{{tenant}}_extL3_AEP/gen-default.json payload{"infraGeneric":{"attributes":{"dn":"uni/infra/attentp-{{tenant}}_extL3_AEP/gen-default","status":"modified"},"children":[{"infraRsFuncToEpg":{"attributes":{"dn":"uni/infra/attentp-{{tenant}}_extL3_AEP/gen-default/rsfuncToEpg-[uni/tn-{{tenant}}/ap-{{tenant}}_AppProfile/epg-App_Servers]","status":"deleted"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/infra.json payload{"infraInfra":{"attributes":{"dn":"uni/infra","status":"modified"},"children":[{"infraAttEntityP":{"attributes":{"dn":"uni/infra/attentp-{{tenant}}_Bare_Metal","name":"{{tenant}}_Bare_Metal","rn":"attentp-{{tenant}}_Bare_Metal","status":"created"},"children":[{"infraGeneric":{"attributes":{"dn":"uni/infra/attentp-{{tenant}}_Bare_Metal/gen-default","name":"default","rn":"gen-default","status":"created,modified"},"children":[{"infraRsFuncToEpg":{"attributes":{"tDn":"uni/tn-{{tenant}}/ap-{{tenant}}_AppProfile/epg-App_Servers","encap":"vlan-{{extVLAN}}","mode":"untagged","status":"created,modified"},"children":[]}}]}},{"infraRsDomP":{"attributes":{"tDn":"uni/phys-{{tenant}}_physical","status":"created"},"children":[]}}]}},{"infraFuncP":{"attributes":{"dn":"uni/infra/funcprof","status":"modified"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/tn-{{tenant}}/ap-{{tenant}}_AppProfile/epg-App_Servers/rsdomAtt-[uni/phys-{{tenant}}_physical].json payload{"fvRsDomAtt":{"attributes":{"encap":"vlan-{{extVLAN}}","tDn":"uni/phys-{{tenant}}_physical"},"children":[]}} response: {"totalCount":"0","imdata":[]}

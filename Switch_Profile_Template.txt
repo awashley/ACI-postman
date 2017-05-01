@@ -1,0 +1,26 @@
+!!! The following will create the Access Policies needed for Bare Metal connection using the following
+!!! 
+!!! Environment variables are:
+!!! APIC = {{url}}
+!!! Policy prefix = {{prefix}}
+!!! VLAN pool start = {{begVLAN}}
+!!! VLAN pool end = {{endVLAN}}
+!!! interface range start = {{begINTF}}
+!!! interface range end = {{endINTF}}
+!!! Leaf Node = {{leaf}}
+
+
+
+{{url}}/api/node/mo/uni/infra/funcprof/accnodepgrp-{{prefix}}_Switch_Policy.json payload{"infraAccNodePGrp":{"attributes":{"dn":"uni/infra/funcprof/accnodepgrp-{{prefix}}_Switch_Policy","name":"{{prefix}}_Switch_Policy","rn":"accnodepgrp-{{prefix}}_Switch_Policy","status":"created"},"children":[]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/infra/vlanns-[{{prefix}}_VLAN_Pool]-static.json payload{"fvnsVlanInstP":{"attributes":{"dn":"uni/infra/vlanns-[{{prefix}}_VLAN_Pool]-static","name":"{{prefix}}_VLAN_Pool","allocMode":"static","rn":"vlanns-[{{prefix}}_VLAN_Pool]-static","status":"created"},"children":[{"fvnsEncapBlk":{"attributes":{"dn":"uni/infra/vlanns-[{{prefix}}_VLAN_Pool]-static/from-[vlan-{{begVLAN}}]-to-[vlan-{{endVLAN}}]","from":"vlan-{{begVLAN}}","to":"vlan-{{endVLAN}}","allocMode":"static","rn":"from-[vlan-{{begVLAN}}]-to-[vlan-{{endVLAN}}]","status":"created"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/phys-{{prefix}}_Physical_Domain.json payload{"physDomP":{"attributes":{"dn":"uni/phys-{{prefix}}_Physical_Domain","name":"{{prefix}}_Physical_Domain","rn":"phys-{{prefix}}_Physical_Domain","status":"created"},"children":[{"infraRsVlanNs":{"attributes":{"tDn":"uni/infra/vlanns-[{{prefix}}_VLAN_Pool]-static","status":"created"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/infra/attentp-{{prefix}}_Access_AEP.json payload{"infraAttEntityP":{"attributes":{"dn":"uni/infra/attentp-{{prefix}}_Access_AEP","name":"{{prefix}}_Access_AEP","rn":"attentp-{{prefix}}_Access_AEP","status":"created"},"children":[{"infraRsDomP":{"attributes":{"tDn":"uni/phys-{{prefix}}_Physical_Domain","status":"created"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/infra/funcprof/accportgrp-{{prefix}}_Access_Port_Policy.json payload{"infraAccPortGrp":{"attributes":{"dn":"uni/infra/funcprof/accportgrp-{{prefix}}_Access_Port_Policy","name":"{{prefix}}_Access_Port_Policy","rn":"accportgrp-{{prefix}}_Access_Port_Policy","status":"created"},"children":[{"infraRsAttEntP":{"attributes":{"tDn":"uni/infra/attentp-{{prefix}}_Access_AEP","status":"created,modified"},"children":[]}},{"infraRsCdpIfPol":{"attributes":{"tnCdpIfPolName":"CDP_DISABLE","status":"created,modified"},"children":[]}},{"infraRsLldpIfPol":{"attributes":{"tnLldpIfPolName":"LLDP_ENABLE","status":"created,modified"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/infra/accportprof-{{prefix}}_Intf_Pool.json payload{"infraAccPortP":{"attributes":{"dn":"uni/infra/accportprof-{{prefix}}_Intf_Pool","name":"{{prefix}}_Intf_Pool","rn":"accportprof-{{prefix}}_Intf_Pool","status":"created,modified"},"children":[{"infraHPortS":{"attributes":{"dn":"uni/infra/accportprof-{{prefix}}_Intf_Pool/hports-{{prefix}}_Intf_Pots-typ-range","name":"{{prefix}}_Intf_Pots","rn":"hports-{{prefix}}_Intf_Pots-typ-range","status":"created,modified"},"children":[{"infraPortBlk":{"attributes":{"dn":"uni/infra/accportprof-{{prefix}}_Intf_Pool/hports-{{prefix}}_Intf_Pots-typ-range/portblk-block2","fromPort":"{{begINTF}}","toPort":"{{endINTF}}","name":"block2","rn":"portblk-block2","status":"created,modified"},"children":[]}},{"infraRsAccBaseGrp":{"attributes":{"tDn":"uni/infra/funcprof/accportgrp-{{prefix}}_Access_Port_Policy","status":"created,modified"},"children":[]}}]}}]}} response: {"totalCount":"0","imdata":[]}
+
+{{url}}/api/node/mo/uni/infra/nprof-{{prefix}}_Leaf_Profile.json payload{"infraNodeP":{"attributes":{"dn":"uni/infra/nprof-{{prefix}}_Leaf_Profile","name":"{{prefix}}_Leaf_Profile","rn":"nprof-{{prefix}}_Leaf_Profile","status":"created,modified"},"children":[{"infraRsAccPortP":{"attributes":{"tDn":"uni/infra/accportprof-{{prefix}}_Intf_Pool","status":"created,modified"},"children":[]}}]}} response: {"totalCount":"0","imdata":[]}
